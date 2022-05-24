@@ -48,7 +48,7 @@ architecture Behavioral of shift_unit is
 begin
 
  process(N)
-    variable index_msb_N: integer range -1 to BIT_WIDTH - 1:= -1;
+    variable index_msb_N: integer range 0 to BIT_WIDTH - 1:= 0;
     --constant bit_mask:unsigned (BIT_WIDTH - 1 downto 0):= ((BIT_WIDTH - 1) downto (BIT_WIDTH - 1 - INTS) => '0', others => '1');--(others => '1');
     
     begin 

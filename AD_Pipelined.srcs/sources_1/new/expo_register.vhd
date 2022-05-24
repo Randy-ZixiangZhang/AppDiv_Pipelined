@@ -8,10 +8,9 @@ use IEEE.NUMERIC_STD.ALL;
 
 entity expo_register is 
     generic( BIT_WIDTH : integer);
-    port(CLK,RESET: in bit;
+    port(CLK,RESET: in std_logic;
         D: in integer range 0 to BIT_WIDTH - 1;
         Q: out integer range 0 to BIT_WIDTH - 1);
-
 end expo_register;
 
 architecture behavior of expo_register is

@@ -6,21 +6,20 @@ use IEEE.STD_LOGIC_1164.ALL;
 -- arithmetic functions with Signed or Unsigned values
 use IEEE.NUMERIC_STD.ALL;
 
-entity mantissa_register is 
+entity expo_reg is 
     generic( BIT_WIDTH : integer);
     port(CLK,RESET: in std_logic;
-        D: in unsigned (BIT_WIDTH - 1 downto 0);
-        Q: out unsigned (BIT_WIDTH - 1 downto 0));
+        D: in integer range 0 to BIT_WIDTH - 1;
+        Q: out integer range 0 to BIT_WIDTH - 1);
+end expo_reg;
 
-end mantissa_register;
-
-architecture behavior of mantissa_register is
+architecture behavior of expo_reg is
 
 begin
     process(CLK,RESET)
         begin
             if RESET = '1' then
-                Q <= (others => '0');
+                Q <= 0;
             elsif CLK = '1' and CLK'event then
                 Q <= D;
             end if;
