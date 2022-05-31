@@ -32,10 +32,10 @@ USE ieee.std_logic_1164.ALL;
 -- arithmetic functions with Signed or Unsigned values
 --USE ieee.numeric_std.ALL;
  
-ENTITY tb_AppDiv_Pipelined IS
-END tb_AppDiv_Pipelined;
+ENTITY tb_AppDiv_Pipelined_automated IS
+END tb_AppDiv_Pipelined_automated;
  
-ARCHITECTURE behavior OF tb_AppDiv_Pipelined IS 
+ARCHITECTURE behavior OF tb_AppDiv_Pipelined_automated IS 
  
     -- Component Declaration for the Unit Under Test (UUT)
    --Inputs

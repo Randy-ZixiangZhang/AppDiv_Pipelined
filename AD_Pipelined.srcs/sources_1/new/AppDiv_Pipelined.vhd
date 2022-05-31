@@ -317,50 +317,49 @@ begin
     );
     
     -- END PIPELINE STAGE3 BIGLUT
-    
-    
-    
-    -- four
     rom:AppDiv_ROM port map(
         CLK => Clk,
        addr => addr_reg_out,
        data => data_sig
     );
     
-    d_reg:data_reg port map(
-        CLK => Clk,
-        RESET => Reset,
-        D => data_sig,
-        Q => data_reg_out
-    );
     
-    mtisa_A_reg_stage4:mantissa_register port map(
-                CLK => Clk,
-                RESET => Reset,
-                D => matisa_A_reg_out3,
-                Q => matisa_A_reg_out4
-                );
+    -- four
+    
+--    d_reg:data_reg port map(
+--        CLK => Clk,
+--        RESET => Reset,
+--        D => data_sig,
+--        Q => data_reg_out
+--    );
+    
+--    mtisa_A_reg_stage4:mantissa_register port map(
+--                CLK => Clk,
+--                RESET => Reset,
+--                D => matisa_A_reg_out3,
+--                Q => matisa_A_reg_out4
+--                );
 
-    mtisa_B_reg_stage4:mantissa_register port map(
-                CLK => Clk,
-                RESET => Reset,
-                D => matisa_B_reg_out3,
-                Q => matisa_B_reg_out4           
-                );
+--    mtisa_B_reg_stage4:mantissa_register port map(
+--                CLK => Clk,
+--                RESET => Reset,
+--                D => matisa_B_reg_out3,
+--                Q => matisa_B_reg_out4           
+--                );
                 
-    num_reg3:num_shift_reg port map(
-                CLK => Clk,
-                RESET => Reset,
-                D => num_shift_reg_out2,
-                Q => num_shift_reg_out3
-    );
+--    num_reg3:num_shift_reg port map(
+--                CLK => Clk,
+--                RESET => Reset,
+--                D => num_shift_reg_out2,
+--                Q => num_shift_reg_out3
+--    );
     
     
     arith: arithmetic_unit port map(
-                Mantissa_Dividend =>matisa_A_reg_out4,
-                Mantissa_Divisor =>matisa_B_reg_out4,
-                data => data_reg_out,
-                Num_shift => num_shift_reg_out3,
+                Mantissa_Dividend =>matisa_A_reg_out3,
+                Mantissa_Divisor =>matisa_B_reg_out3,
+                data => data_sig,
+                Num_shift => num_shift_reg_out2,
                 Quotient => Quotient
     );
     

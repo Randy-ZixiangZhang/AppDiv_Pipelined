@@ -49,7 +49,7 @@ architecture Behavioral of arithmetic_unit is
 begin
 
     --process(Mantissa_Dividend,Mantissa_Divisor,P00,P01,P10,Num_shift)
-    process
+    process(Mantissa_Dividend,Mantissa_Divisor,data,Num_shift)
        variable p00:unsigned (11 downto 0);
        variable p01:unsigned (11 downto 0);
        variable p10:unsigned (11 downto 0); 

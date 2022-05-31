@@ -55,14 +55,13 @@ begin
         for i in BIT_WIDTH - 1 downto 0 loop
             if N(i) = '1' then
                 index_msb_N:= i;
-                Exp <= index_msb_N;
-                N_s <= shift_left(N, BIT_WIDTH - index_msb_N); --shift to remove the MSB --and bit_mask;
                 exit;
             else
                 next;
             end if;
         end loop;
-    
+        Exp <= index_msb_N;
+        N_s <= shift_left(N, BIT_WIDTH - index_msb_N); --shift to remove the MSB --and bit_mask;   
 	end process;
 
 -- possible future improvement:
