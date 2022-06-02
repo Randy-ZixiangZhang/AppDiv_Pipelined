@@ -31,6 +31,9 @@ USE ieee.std_logic_1164.ALL;
 -- Uncomment the following library declaration if using
 -- arithmetic functions with Signed or Unsigned values
 --USE ieee.numeric_std.ALL;
+use IEEE.std_logic_textio.all; 
+library std;
+     use std.textio.all; 
  
 ENTITY tb_AppDiv_Pipelined_automated IS
 END tb_AppDiv_Pipelined_automated;
@@ -51,8 +54,18 @@ ARCHITECTURE behavior OF tb_AppDiv_Pipelined_automated IS
    -- appropriate port name 
  
    --constant <clock>_period : time := 10 ns;
-    constant C_CLK :time := 20 ns;
-
+    constant C_CLK :time := 10 ns;
+    constant Data_in:string := "/home/randy/Documents/AD_Pipelined/MATLAB_src/Simulation_related_txt/DataIn.txt";
+    constant Data_out:string := "/home/randy/Documents/AD_Pipelined/MATLAB_src/Simulation_related_txt/DataOut.txt";
+    file fptr: text;
+    file fptr_out: text;  
+    
+    --write 
+    file w_file:text; 
+    
+    signal flag_done:boolean := false;
+    constant C_DATA1_W   :integer := 16;
+    constant C_DATA2_W   :integer := 16;
 BEGIN
  
 	-- Instantiate the Unit Under Test (UUT)
@@ -71,7 +84,46 @@ BEGIN
    end process; 
        
     RESET <= '0';
- 	N_a <= "0010000111000000", "1001011111010110" after 70ns,"0011011111010110" after 100ns;
-	N_b <= "0000100000110000", "0001000101001111" after 70ns,"0001011111010110" after 100ns;
 
-END;
+    GetData_proc: process
+        variable clock_count:integer:= 0;
+        
+        variable fstatus:file_open_status;
+        variable file_line     :line;
+        variable var_data1     :integer;
+        variable var_data2     :integer;
+        variable good1:boolean;
+        variable good2:boolean;
+        
+        variable w_file_is_open: boolean;
+        variable trace_line : line;
+    begin
+        file_open(fptr,Data_in,READ_MODE);
+        file_open(fstatus,w_file,Data_out,WRITE_MODE);
+    
+        while (not endfile(fptr)) loop
+            wait until CLK = '1';
+            
+            readline(fptr,file_line);
+            read(file_line, var_data1,good1);
+            read(file_line, var_data2,good2);     
+    
+            N_a <= shift_left(to_unsigned(var_data1,C_DATA1_W),4);
+            N_b <= shift_left(to_unsigned(var_data2,C_DATA1_W),4);
+            clock_count := clock_count + 1;
+            
+            if clock_count >= 4 then
+                wait for 5ns;
+                write(trace_line,std_logic_vector(Q));
+                writeline(w_file,trace_line);
+            end if;
+         end loop; 
+         
+        wait  until rising_edge(clk);
+            flag_done <= true;
+            file_close(fptr);  
+            file_close(fptr_out); 
+        wait;
+         
+    end process;
+end;

@@ -3,7 +3,7 @@ max = 2^INTEGER_WIDTH-1;
 
 point = POINT;
 
-fid = fopen('DataIn.txt','wt');
+fid = fopen('Simulation_related_txt/DataIn.txt','wt');
 
 m_i = floor(linspace(max,1,point));
 for i = m_i(1:end-1)

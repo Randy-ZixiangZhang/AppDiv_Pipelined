@@ -1,24 +1,28 @@
-function Analyse_Output(BIT_WIDTH,INTEGER_WIDTH)
+clear,clc
+close all
+BIT_WIDTH = 28;
+INTEGER_WIDTH = 12;
+no_frac = 16;
 
-fid = fopen('DataOut.txt','r');
-formatSpec = '%d %d %*d';
+fid = fopen('Simulation_related_txt/DataOut.txt','r');
+formatSpec = '%s';
+sizeOut = [inf 1];
+B = textscan(fid,formatSpec,sizeOut); %B cell 
+fclose(fid);
+numberofpoints = size(B{1,1},1);
+
+
+
+fid = fopen('Simulation_related_txt/DataIn.txt','r');
+formatSpec = '%d %d';
 sizeA = [2 inf]; 
-
-
 A = fscanf(fid,formatSpec,sizeA);
 fclose(fid);
 
 
-fid = fopen('DataOut.txt','r');
-formatSpec = '%*d %*d %s';
-
-Data = zeros(size(A) + [1 0]);
-Data(1:2,1:end) = A;
+Data = zeros(4,numberofpoints);
+Data(1:2,1:end) = A(:,1:numberofpoints);
 Data(4,:) = Data(1,:)./Data(2,:);
-
-B = textscan(fid,formatSpec); %B cell 
-fclose(fid);
-
 
 total_bit_Q = BIT_WIDTH;
 no_int = INTEGER_WIDTH;
@@ -26,7 +30,7 @@ no_int = INTEGER_WIDTH;
 
 no_quotient = size(A,2);
 
-for i = 1 : no_quotient
+for i = 1 : numberofpoints
     char_Q = B{1,1}{i,1};
     temp = 0;
     for j = 1:total_bit_Q
@@ -35,30 +39,6 @@ for i = 1 : no_quotient
     end
     Data(3,i) = temp;
 end 
-
-
-
-%how many bits supposed to take int representation
-
-
-% temp = zeros(1,12);
-% for i = 1:size(A,2)
-%     temp = convert2binary(Data(3,i),no_int_simu,no_frac_simu);
-%     t = 0;
-%     for j = 1:(no_int_simu+no_frac_simu)
-%         t = t + temp(j) * 2^(no_int-j);
-%     end
-%     Data(3,i) = t;
-% end 
-
-%first row dividend
-%second row divisor
-%third output collected from simulation
-
-
-
-
-
 
 
 Error_Per = (Data(3,:) - Data(4,:))./Data(4,:) * 100;
@@ -86,15 +66,16 @@ max(abs(Error_Per))
 % [X,Y] = meshgrid(Data_sampled(1,:),Data_sampled(2,:));
 % Error_Per_sampled = reshape(Error_Per_sampled,size(X));
 % surf(X,Y,Error_Per_sampled);
-plot3(Data(1,:),Data(2,:),Error_Per);
+figure
+plot3(Data(1,:),Data(2,:),Error_Per,'.','MarkerSize', 2);
 
 
-%% plot according to approximate regions
+% plot according to approximate regions
 Data_Region = zeros(size(Data));
-no_int = 12;no_frac = 4;
+
 %convert Dividend to Dividend_Mantissa
 
-for i = 1:size(A,2)
+for i = 1:numberofpoints
     temp = convert2binary(Data(1,i),no_int,no_frac);
     for  j = 1:(no_int+no_frac)
         if temp(j) == 1
@@ -115,7 +96,7 @@ end
 
 %convert Divisorto Dividend_Mantissa
 
-for i = 1:size(A,2)
+for i = 1:numberofpoints
     temp = convert2binary(Data(2,i),no_int,no_frac);
     for  j = 1:(no_int+no_frac)
         if temp(j) == 1
@@ -137,9 +118,10 @@ end
 %Copy error data from Data
 Data_Region(3:4,:) = Data(3:4,:);
 %plot
+figure
 plot3(Data_Region(1,:),Data_Region(2,:),Error_Per,'.','MarkerSize', 2);
+title('plotting against fitting region')
 xlabel('Dividend_mantissa');
 ylabel('Divisor_mantissa');
 zlabel('Error_100Percentage');
 
-end
