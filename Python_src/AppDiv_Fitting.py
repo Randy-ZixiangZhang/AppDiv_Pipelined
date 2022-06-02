@@ -2,11 +2,14 @@
 
 from Unit_Def import Shifter,Big_LUT
 from binary_fractions import Binary
-
+import math
+import numpy as np
 class AppDiv:
-    def __init__(self,shifter:Shifter,lut:Big_LUT):
+
+
+    def __init__(self,bit_width,radix_pos,lut:Big_LUT):
         #give the bit length
-        self._shifter = shifter
+        self._shifter = Shifter(bit_width,radix_pos)
         self._lut = lut
 
     def execute(self,dividend,divisor): #how to make take different type of number, string, number
@@ -26,6 +29,43 @@ class AppDiv:
         quotient = dividend/divisor
         error = (final - quotient)/quotient*100
         return final,quotient,error
+
+    def error_summary(self,test_parameter,flag_showbar = False):
+        maximum_input = self._shifter.max_num
+        errors = []
+        m_i = np.floor(np.linspace(maximum_input,1,test_parameter))
+
+        if flag_showbar == True:
+            number_points = 0
+            for i in m_i[:-1]:
+                for j in np.floor(np.linspace(i,1,math.floor(test_parameter*i/maximum_input))):
+                    number_points+=1
+
+        number_failed_points = 0
+        number_success_points = 0
+        progress = 0
+        for i in m_i[:-1]:
+            for j in np.floor(np.linspace(i,1,math.floor(test_parameter*i/maximum_input))):
+                try: 
+                    final,quotient,error = self.execute(i,j)
+                    errors.append(abs(error))
+                    number_success_points+=1
+                    if flag_showbar == True:
+                        new_progress = np.floor(number_success_points/number_points*100)
+                        if new_progress - progress == 1:
+                            progress = new_progress
+                            print(f'progress: {new_progress:.0f} percentage')
+                           
+                except:
+                    number_failed_points += 1
+                    continue
+        error_average = sum(errors)/len(errors)
+        error_max = max(errors)
+        print("AppDiv with approximate regions ",self._lut.number_region, " by ",self._lut.number_region)
+        print(f'has averge error of {error_average:.3f} percentage')
+        print(f'maximum error of {error_max:.3f} percentage' )
+        print("tested points ",len(errors), " in total")
+        print("failed points due to conversion bugs: ",number_failed_points)
     @property
     def Bit_Width(self):
         return self.Bit_Width 
@@ -33,11 +73,9 @@ class AppDiv:
 
 if __name__ == "__main__":
     shifter1 = Shifter(16,4)
-    big1 = Big_LUT(10,16)
-    appdiv1 = AppDiv(shifter1,big1)
+    big1 = Big_LUT(15,16)
+    appdiv1 = AppDiv(16,4,big1)
     print(appdiv1.execute(15,12))
-    
-    shift2 = Shifter(16,4)
-    big2 = Big_LUT(20,12)
-    appdiv2 = AppDiv(shift2,big2)
-    print(appdiv2.execute(15,12))
+    appdiv1.error_summary(50,True)
+
+
