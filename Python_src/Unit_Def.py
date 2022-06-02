@@ -1,35 +1,83 @@
-from collections import namedtuple
-from typing import Tuple
+
 from binary_fractions import Binary
 
-from random import seed
-from random import randint
+class Shifter(): #shift_unit in vhd
+    _input = None
+    _bit_width = None
+    _radix_pos = None
+    def __init__(self,bit_width,radix_pos) -> None:
+        self._bit_width = bit_width
+        self._radix_pos = radix_pos
+
+    @property
+    def input(self):
+        return self._input
+    @input.setter
+    def input(self,num:float):
+        if num > self.max_num or num < self.min_num:
+            raise Shifter("input number outside range")
+        else:
+            self._input = num
+    @property
+    def max_num(self): #maximum value representable
+        int_part = 2**(self._bit_width-self._radix_pos) - 1
+        fractional_part = 0
+        for i in range(1,self._radix_pos+1):
+            fractional_part += (1/2)**i
+        return int_part + fractional_part
+    @property
+    def min_num(self):
+        return (1/2)**self._radix_pos        
+    
+    def getBinaryStr(self):
+        #from float to str, and remove bit exceeding radix_pos
+        bf2str:str = str(Binary(self.input))
+        if bf2str.find('.') == -1:
+            bf2str = bf2str + ".0"
+        dot_pos = bf2str.find('.')
+        return (bf2str[:dot_pos + self._radix_pos + 1 ])
+
+    def getMantissaExpo(self):
+        BinaryStr = self.getBinaryStr()
+        pos_radix = BinaryStr.find('.')
+        for index,bit in enumerate(BinaryStr):
+            if bit == '1':
+                pos_firstOne = index
+                break 
+        mantissa_str = BinaryStr[pos_firstOne+1:]
+        expo = pos_radix - pos_firstOne - 1
+        mantissa = str(Binary(mantissa_str)*Binary("1e{}".format(-expo)))
+        return (mantissa,expo)
+
+#test
+
+
+if __name__ == "__main__":        
+    shift1 = Shifter(16,4)
+
+    print(shift1.max_num)
+    print(shift1.min_num)
+    shift1.input = 14
+    print(shift1.getBinaryStr())
+    a,b = shift1.getMantissaExpo()
+    print(a,b)
+
 
 import numpy
-
-#from scipy.optimize import curve_fit
-
 import bisect
-
+from scipy.optimize import curve_fit
+def float2bin(num:float,precision:int)->str:
+    bf2str:str = str(Binary(num))
+    if bf2str.find('.') == -1:
+        bf2str = bf2str + ".0"
+    radix_pos = bf2str.find('.')
+    return(bf2str[:radix_pos + precision + 1])
 def approximate_func(M,p00,p01,p10):
     x,y = M
     arr = numpy.zeros(x.shape)
     return p01*x+p10*y + p00
 
-
-class Number: #feed into a list to manage all the points. use tuple to contain 
-    def __init__(self,decimal,bit_width,radix_pos) -> None:
-        self.decimal = decimal
-        self.binary = bin(decimal)
-        #self.mantissa =  
-        #self.expo = 
-
-
-
-
 class Big_LUT:
-
-
     def __init__(self,number_region:int,bit_width_keys:int) -> None: #lively look up would be too expensive #so generate a data structure and feed into it?
         self.number_region =  number_region
         self.bit_width_keys = bit_width_keys
@@ -59,7 +107,11 @@ class Big_LUT:
             self.fitting_database[key_paras] = paras
             return (paras)
 
-        return (self.fitting_database.get(key_paras))
+        p00,p01,p10_ex = self.fitting_database.get(key_paras)
+        p00 = Binary.to_float(float2bin(p00,16))
+        p01 = Binary.to_float(float2bin(p01,16))
+        p10 = -abs(Binary.to_float(float2bin(p10_ex,12)))
+        return (p00,p01,p10)
 
     def lookforParas(self,index_tuple,DividendLarger): #-> Tuple[p00,p01,p11]:
         index_dividend,index_divisor = index_tuple
@@ -74,66 +126,15 @@ class Big_LUT:
 
         popt,pcov = curve_fit(approximate_func,numpy.vstack((X.ravel(),Y.ravel())),Z.ravel())
         return popt
-                
-        
-
-#composition, AD needs fitting data
-class Approximate_Divider:
-    def __init__(self,big_lut_unit:Big_LUT) -> None:
-        pass
-        
-    def arithmetic():
-        pass
-
-class Shift_Unit:
-    pass
-
-#class Approximate_Region:
-#    def fix2float(self,)
-
-class Report_Generator:
-    pass
 
 
-def dec2bin():
-    pass
 
-
-#dividend and divisor should be object themselve, radix info should be within it.
-def single_run(dividend,divisor):
-    input_bit_width = 16
-    input_radix_pos = 12
-    value = randint()
-
-def overall_accessment():
-    #input format
-    input_bit_width = 16
-    input_radix_pos,output_radix_pos = 12  
-    output_bit_width = 32
-
-    numberofsampingPoints = 15000
-
-    #call it
-
-
-    #this should infer all the samping points
-
-    #generate all sample points, put them in a list(number)
-    #feed into class Approximate_Divider
-    app_div = Approximate_Divider()
-    dividend_mantissa,divisor_mantissa,dividend_expo,divisor_expo = app_div.fix2float()
-
-    # var1,var2,var3 =  app_div.bigLUT(dividend_mantissa,divisor_mantissa)
-    # app_div.compute(dividend_mantissa,divisor_mantissa(var1,var2,var3))
-    # app_div.shifting(back)
-
-    #arithmetic format
-    arith_radix_pos = 4
-    output_bit_width = 32
-
-
-#able to generate report for a particular region!!!!!!!!!!
 
 if __name__ == "__main__":
+    ([(lambda x:2*x)(x) for x in [2,3,5]])
     big = Big_LUT(10,16)
-    big.find(3.5)
+    print(big.find(0.15,0.25))
+    """ print(big.boundaries_pair_list[9])
+    print(big.boundaries) """
+
+
