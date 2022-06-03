@@ -108,9 +108,9 @@ class Big_LUT:
             return (paras)
 
         p00,p01,p10_ex = self.fitting_database.get(key_paras)
-        p00 = Binary.to_float(float2bin(p00,16))
-        p01 = Binary.to_float(float2bin(p01,16))
-        p10 = -abs(Binary.to_float(float2bin(p10_ex,12)))
+        p00 = Binary.to_float(float2bin(p00,self.bit_width_keys-3))
+        p01 = Binary.to_float(float2bin(p01,self.bit_width_keys-3))
+        p10 = -abs(Binary.to_float(float2bin(p10_ex,self.bit_width_keys-3)))
         return (p00,p01,p10)
 
     def lookforParas(self,index_tuple,DividendLarger): #-> Tuple[p00,p01,p11]:
