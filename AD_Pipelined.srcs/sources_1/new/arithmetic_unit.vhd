@@ -50,6 +50,8 @@ begin
 
     --process(Mantissa_Dividend,Mantissa_Divisor,P00,P01,P10,Num_shift)
     process(Mantissa_Dividend,Mantissa_Divisor,data,Num_shift)
+    
+    
        variable p00:unsigned (11 downto 0);
        variable p01:unsigned (11 downto 0);
        variable p10:unsigned (11 downto 0); 
@@ -62,18 +64,19 @@ begin
        variable app_M: unsigned (BIT_WIDTH-1 + 12 downto 0);
        variable long_p00: unsigned (BIT_WIDTH-1 + 12 downto 0) := (others => '0');
         
+       constant No_int: integer:= 2; -- for fitting region 6 by 6,  
        constant offset: integer:= 10; --output radix position - tempMUL radix position
         
         begin
         
         -- has to be aware that 2 bits are used for integer represnetation for each parameter
         
-        p00 := data(35 downto 24);
-        p01 := data(23 downto 12);
-        p10 := data(11 downto 0);
+        p00 := data(35 downto 24); -- in total 12 bits
+        p01 := data(23 downto 12); -- in total 12 bits
+        p10 := data(11 downto 0); -- in total 12 bits
         
-            tempMUL_1 := p10*Mantissa_Dividend;
-            tempMUL_2 := p01*Mantissa_Divisor;
+            tempMUL_1 := p10*Mantissa_Dividend; -- 16(mantissa int = 0) + 12(int = 2) = 28 bits
+            tempMUL_2 := p01*Mantissa_Divisor; -- so radix point is 00.00xx...xx0
             
             long_p00((BIT_WIDTH -1 + 12) downto BIT_WIDTH) := p00;
             

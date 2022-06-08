@@ -1,5 +1,5 @@
 %Generate Big Lut VHD file directly.
-No_fit_area = 10;
+No_fit_area = 6;
 BIT_WIDTH = 16;
 
 vhd = fopen('./MATLAB_vhd/big_LUT.vhd','wt');

@@ -1,4 +1,5 @@
-No_fit_area = 10;
+
+No_fit_area = 6;
 
 %one location, bit budget 36bits
 UNIT_WIDTH = 12;
@@ -8,6 +9,8 @@ UNIT_WIDTH = 12;
 %half plane partition
 %Manstissa _ Dividend > Divisor
 p = No_fit_area; %partition_region p*p
+No_element_array = (1+p)*p;
+
 
 para1 = cell(p,p);
 GOOD = cell(p,p);
@@ -44,11 +47,6 @@ fclose(fid);
 
 %second half plane partition
 
-p = 10; %partition_region p*p
-no_integer = 4;
-no_fraction = 12;
-no_total = no_integer + no_fraction;
-
 para2 = cell(p,p);
 
 P00 = zeros(p,p);
@@ -84,7 +82,7 @@ end
 
 fclose(fid);
 
-
+%decide how much MSB are used to represent integer
 no_int = floor((log2((record_max))+1));
 
 fprintf('bits for integer representation %d\n',no_int);
@@ -101,7 +99,7 @@ fprintf(vhd,'use ieee.std_logic_unsigned.all;\n');
 fprintf(vhd,'use IEEE.NUMERIC_STD.ALL;\n\n');
 
 fprintf(vhd,'entity AppDiv_ROM is\n');
-fprintf(vhd,'   Port ( clk : in bit;\n');
+fprintf(vhd,'   Port ( clk : in std_logic;\n');
 fprintf(vhd,'       addr : in std_logic_vector(8 downto 0);\n');
 fprintf(vhd,'       data : out unsigned(35 downto 0)\n');
 fprintf(vhd,'       );\n');

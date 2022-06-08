@@ -70,8 +70,21 @@ BEGIN
         wait for 2*C_CLK;
    end process; 
        
-    RESET <= '0';
- 	N_a <= "0010000111000000";-- "1001011111010110" after 70ns,"0011011111010110" after 100ns;
-	N_b <= "0000100000110000";-- "0001000101001111" after 70ns,"0001011111010110" after 100ns;
+       
+    process(CLK)
+       variable Dividend: integer;
+       variable Divisor: integer;
+    
+    begin
+    
+        Dividend:= 3177;
+        Divisor:= 784;
+
+        RESET <= '0';
+        N_a <= to_unsigned(Dividend,12) & "0000";-- "1001011111010110" after 70ns,"0011011111010110" after 100ns;
+        N_b <= to_unsigned(Divisor,12) & "0000";-- "0001000101001111" after 70ns,"0001011111010110" after 100ns;    
+    end process;   
+       
+
 
 END;

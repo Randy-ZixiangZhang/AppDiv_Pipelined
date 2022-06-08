@@ -112,7 +112,7 @@ BEGIN
             N_b <= shift_left(to_unsigned(var_data2,C_DATA1_W),4);
             clock_count := clock_count + 1;
             
-            if clock_count >= 4 then
+            if clock_count >= 5 then
                 wait for 5ns;
                 write(trace_line,std_logic_vector(Q));
                 writeline(w_file,trace_line);
