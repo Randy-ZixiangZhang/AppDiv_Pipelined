@@ -4,14 +4,15 @@ from binary_fractions import Binary
 class Shifter(): #shift_unit in vhd
     _input = None
     _bit_width = None
-    _radix_pos = None
-    def __init__(self,bit_width,radix_pos) -> None:
+    _decimal_pos = None
+    def __init__(self,bit_width,decimal_pos) -> None:
         self._bit_width = bit_width
-        self._radix_pos = radix_pos
+        self._decimal_pos = decimal_pos
 
     @property
     def input(self):
         return self._input
+        
     @input.setter
     def input(self,num:float):
         if num > self.max_num or num < self.min_num:
@@ -20,32 +21,32 @@ class Shifter(): #shift_unit in vhd
             self._input = num
     @property
     def max_num(self): #maximum value representable
-        int_part = 2**(self._bit_width-self._radix_pos) - 1
+        int_part = 2**(self._bit_width-self._decimal_pos) - 1
         fractional_part = 0
-        for i in range(1,self._radix_pos+1):
+        for i in range(1,self._decimal_pos+1):
             fractional_part += (1/2)**i
         return int_part + fractional_part
     @property
     def min_num(self):
-        return (1/2)**self._radix_pos        
+        return (1/2)**self._decimal_pos        
     
     def getBinaryStr(self):
-        #from float to str, and remove bit exceeding radix_pos
+        #from float to str, and remove bit exceeding decimal_pos
         bf2str:str = str(Binary(self.input))
         if bf2str.find('.') == -1:
             bf2str = bf2str + ".0"
         dot_pos = bf2str.find('.')
-        return (bf2str[:dot_pos + self._radix_pos + 1 ])
+        return (bf2str[:dot_pos + self._decimal_pos + 1 ])
 
-    def getMantissaExpo(self):
+    def getMantissaExpo(self): #convert a real value to exponent and mantissa with respect to Figure 3.1
         BinaryStr = self.getBinaryStr()
-        pos_radix = BinaryStr.find('.')
+        pos_decimal = BinaryStr.find('.') # . is the output of the "Binary" library for decimal point
         for index,bit in enumerate(BinaryStr):
             if bit == '1':
-                pos_firstOne = index
+                pos_firstOne = index #index of first leading 1
                 break 
-        mantissa_str = BinaryStr[pos_firstOne+1:]
-        expo = pos_radix - pos_firstOne - 1
+        mantissa_str = BinaryStr[pos_firstOne+1:] #take all the bits after position of '.'
+        expo = pos_decimal - pos_firstOne - 1 #remember the shifts
         mantissa = str(Binary(mantissa_str)*Binary("1e{}".format(-expo)))
         return (mantissa,expo)
 
@@ -70,8 +71,8 @@ def float2bin(num:float,precision:int)->str:
     bf2str:str = str(Binary(num))
     if bf2str.find('.') == -1:
         bf2str = bf2str + ".0"
-    radix_pos = bf2str.find('.')
-    return(bf2str[:radix_pos + precision + 1])
+    decimal_pos = bf2str.find('.')
+    return(bf2str[:decimal_pos + precision + 1])
 def approximate_func(M,p00,p01,p10):
     x,y = M
     arr = numpy.zeros(x.shape)
@@ -108,9 +109,9 @@ class Big_LUT:
             return (paras)
 
         p00,p01,p10_ex = self.fitting_database.get(key_paras)
-        p00 = Binary.to_float(float2bin(p00,self.bit_width_keys-3))
-        p01 = Binary.to_float(float2bin(p01,self.bit_width_keys-3))
-        p10 = -abs(Binary.to_float(float2bin(p10_ex,self.bit_width_keys-3)))
+        p00 = Binary.to_float(float2bin(p00,self.bit_width_keys-4))
+        p01 = Binary.to_float(float2bin(p01,self.bit_width_keys-4))
+        p10 = -abs(Binary.to_float(float2bin(p10_ex,self.bit_width_keys-4)))
         return (p00,p01,p10)
 
     def lookforParas(self,index_tuple,DividendLarger): #-> Tuple[p00,p01,p11]:
