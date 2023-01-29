@@ -28,11 +28,11 @@ class AppDiv:
         mantissa_B = Binary.to_float(mantissaBstr)
         p00,p01,p10 = self._lut.find(mantissa_A,mantissa_B)
         M_exact = p01*mantissa_A + p10*mantissa_B + p00
-        M = self.clip(M_exact)
+        #M = self.clip(M_exact)
         shift = expoA - expoB - 1 if mantissa_A<mantissa_B else expoA - expoB
-        bstr_M = str(Binary(M)*Binary("1e{}".format(shift)))
-        final = Binary.to_float(bstr_M)
-        quotient = dividend/divisor
+        bstr_M = str(Binary(M_exact)*Binary("1e{}".format(shift)))
+        final = Binary.to_float(bstr_M) #approxiamte result
+        quotient = dividend/divisor #exaxt result
         error = (final - quotient)/quotient*100
         return final,quotient,error
 
@@ -65,6 +65,12 @@ class AppDiv:
                             progress = new_progress
                             print(f'progress: {new_progress:.0f} percentage')           
                 except:
+                    #print("dividend")
+                    #print(i)
+                    #print("divisor")
+                    #print(j)
+                    #raise
+                    #error is caused by divided by 1. because after fist leading 1, the mantissa left are all 0.21
                     number_failed_points += 1
                     continue
         error_average = sum(errors)/len(errors)
@@ -101,14 +107,17 @@ if __name__ == "__main__":
     error_max_dict = {}
 
 
-    test_para = 25
+    test_para = 50
 
 
     error_average_list = []
     error_max_list = []
     approximate_region0 = 1
     
-    bit_length_range = range(4,21)
+    bit_len_min = 5
+    bit_len_max = 13
+
+    bit_length_range = range(bit_len_min,bit_len_max)
     for bit_width in bit_length_range:
         lut = Big_LUT(approximate_region0,bit_width)
         appdiv1.setLut(lut)
@@ -122,7 +131,7 @@ if __name__ == "__main__":
     error_max_list = []
     approximate_region1 = 2
 
-    bit_length_range = range(4,21)
+    bit_length_range = range(bit_len_min,bit_len_max)
     for bit_width in bit_length_range:
         lut = Big_LUT(approximate_region1,bit_width)
         appdiv1.setLut(lut)
@@ -136,7 +145,7 @@ if __name__ == "__main__":
     error_max_list = []
     approximate_region2 = 3
 
-    bit_length_range = range(4,21)
+    bit_length_range = range(bit_len_min,bit_len_max)
     for bit_width in bit_length_range:
         lut = Big_LUT(approximate_region2,bit_width)
         appdiv1.setLut(lut)
@@ -150,7 +159,7 @@ if __name__ == "__main__":
     error_max_list = []
     approximate_region3 = 4
 
-    bit_length_range = range(4,21)
+    bit_length_range = range(bit_len_min,bit_len_max)
     for bit_width in bit_length_range:
         lut = Big_LUT(approximate_region3,bit_width)
         appdiv1.setLut(lut)
@@ -166,7 +175,7 @@ if __name__ == "__main__":
 
     approximate_region4 = 6
 
-    bit_length_range = range(4,21)
+    bit_length_range = range(bit_len_min,bit_len_max)
     for bit_width in bit_length_range:
         lut = Big_LUT(approximate_region4,bit_width)
         appdiv1.setLut(lut)
@@ -181,7 +190,7 @@ if __name__ == "__main__":
     error_max_list = []
 
     approximate_region5 = 8
-    bit_length_range = range(4,21)
+    bit_length_range = range(bit_len_min,bit_len_max)
     for bit_width in bit_length_range:
         lut = Big_LUT(approximate_region5,bit_width)
         appdiv1.setLut(lut)
@@ -196,7 +205,7 @@ if __name__ == "__main__":
     error_average_list = []
     error_max_list = []
     approximate_region6 = 10
-    bit_length_range = range(4,21)
+    bit_length_range = range(bit_len_min,bit_len_max)
     for bit_width in bit_length_range:
         lut = Big_LUT(approximate_region6,bit_width)
         appdiv1.setLut(lut)
@@ -206,22 +215,39 @@ if __name__ == "__main__":
     error_average_dict[approximate_region6] = error_average_list
     error_max_dict[approximate_region6] = error_max_list
 
+
+    error_average_list = []
+    error_max_list = []
+    approximate_region7 = 5
+    bit_length_range = range(bit_len_min,bit_len_max)
+    for bit_width in bit_length_range:
+        lut = Big_LUT(approximate_region7,bit_width)
+        appdiv1.setLut(lut)
+        error_average, error_max = appdiv1.error_summary(test_para,True)
+        error_average_list.append(error_average)
+        error_max_list.append(error_max)
+    error_average_dict[approximate_region7] = error_average_list
+    error_max_dict[approximate_region7] = error_max_list
+
     xpoints = np.array(bit_length_range)
 
-    ypoints = np.array(error_max_dict[approximate_region0])
-    plt.plot(xpoints,ypoints,'k',label = f'{approximate_region0:.0f} by {approximate_region0:.0f} regions fitting')
+    #ypoints = np.array(error_max_dict[approximate_region0])
+    #plt.plot(xpoints,ypoints,'k',label = f'{approximate_region0:.0f} by {approximate_region0:.0f} regions fitting')
     ypoints = np.array(error_max_dict[approximate_region1])
     plt.plot(xpoints,ypoints,'b',label = f'{approximate_region1:.0f} by {approximate_region1:.0f} regions fitting')
     ypoints = np.array(error_max_dict[approximate_region2])
     plt.plot(xpoints,ypoints,'r',label = f'{approximate_region2:.0f} by {approximate_region2:.0f} regions fitting')
     ypoints = np.array(error_max_dict[approximate_region3])
     plt.plot(xpoints,ypoints,'g',label = f'{approximate_region3:.0f} by {approximate_region3:.0f} regions fitting')
+    ypoints = np.array(error_max_dict[approximate_region7])
+    plt.plot(xpoints,ypoints,'k',label = f'{approximate_region7:.0f} by {approximate_region7:.0f} regions fitting')
     ypoints = np.array(error_max_dict[approximate_region4])
     plt.plot(xpoints,ypoints,'c',label = f'{approximate_region4:.0f} by {approximate_region4:.0f} regions fitting')
     ypoints = np.array(error_max_dict[approximate_region5])
     plt.plot(xpoints,ypoints,'m',label = f'{approximate_region5:.0f} by {approximate_region5:.0f} regions fitting')
     ypoints = np.array(error_max_dict[approximate_region6])
     plt.plot(xpoints,ypoints,'y',label = f'{approximate_region6:.0f} by {approximate_region6:.0f} regions fitting')
+
     plt.legend(loc = "upper right")
     plt.ylabel("MAEP")
     plt.xlabel("bit width of constant p,q and r")

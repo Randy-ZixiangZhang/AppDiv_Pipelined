@@ -35,8 +35,9 @@ class Shifter(): #shift_unit in vhd
         bf2str:str = str(Binary(self.input))
         if bf2str.find('.') == -1:
             bf2str = bf2str + ".0"
-        dot_pos = bf2str.find('.')
-        return (bf2str[:dot_pos + self._decimal_pos + 1 ])
+        #dot_pos = bf2str.find('.')
+        #return (bf2str[:dot_pos + self._decimal_pos + 1 ])
+        return bf2str
 
     def getMantissaExpo(self): #convert a real value to exponent and mantissa with respect to Figure 3.1
         BinaryStr = self.getBinaryStr()
@@ -45,7 +46,7 @@ class Shifter(): #shift_unit in vhd
             if bit == '1':
                 pos_firstOne = index #index of first leading 1
                 break 
-        mantissa_str = BinaryStr[pos_firstOne+1:] #take all the bits after position of '.'
+        mantissa_str = BinaryStr[pos_firstOne+1:] #take all the bits after position of leading 1
         expo = pos_decimal - pos_firstOne - 1 #remember the shifts
         mantissa = str(Binary(mantissa_str)*Binary("1e{}".format(-expo)))
         return (mantissa,expo)
@@ -72,7 +73,7 @@ def float2bin(num:float,precision:int)->str:
     if bf2str.find('.') == -1:
         bf2str = bf2str + ".0"
     decimal_pos = bf2str.find('.')
-    return(bf2str[:decimal_pos + precision + 1])
+    return(bf2str[:decimal_pos + 1 + precision])
 def approximate_func(M,p00,p01,p10):
     x,y = M
     arr = numpy.zeros(x.shape)
@@ -109,9 +110,12 @@ class Big_LUT:
             return (paras)
 
         p00,p01,p10_ex = self.fitting_database.get(key_paras)
-        p00 = Binary.to_float(float2bin(p00,self.bit_width_keys-4))
-        p01 = Binary.to_float(float2bin(p01,self.bit_width_keys-4))
+        p00 = Binary.to_float(float2bin(p00,self.bit_width_keys-2))
+        #p00 = Binary.to_float(float2bin(p00,30))
+        p01 = Binary.to_float(float2bin(p01,self.bit_width_keys-2))
+        #p01 = Binary.to_float(float2bin(p01,30))
         p10 = -abs(Binary.to_float(float2bin(p10_ex,self.bit_width_keys-4)))
+        #p10 = -abs(Binary.to_float(float2bin(p10_ex,30)))
         return (p00,p01,p10)
 
     def lookforParas(self,index_tuple,DividendLarger): #-> Tuple[p00,p01,p11]:
